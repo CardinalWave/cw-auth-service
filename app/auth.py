@@ -1,15 +1,19 @@
+import token
 from . import keycloak_openid, keycloak_admin
 from .utils import generate_token
+from .login  import extract_to_login
 
 class AuthCredentials:
-    def __init__(self, email, password):
+    def __init__(self, email, password, username=None):
+        self.username = username
         self.email = email
         self.password = password
 
 def login(credentials: AuthCredentials):
-    token = keycloak_openid.token(credentials.email, credentials.password)
+    token = keycloak_openid.token(credentials.email, credentials.password, scope='openid')
     userinfo = keycloak_openid.userinfo(token['access_token'])
-    return "Logado com sucesso!"
+    return  extract_to_login(userinfo).to_json()
+
 
 def logout():
     keycloak_openid.logout(token['refresh_token'])
@@ -19,7 +23,7 @@ def register(credentials: AuthCredentials):
     token_unico = generate_token()
     keycloak_admin.create_user({
         "email": credentials.email,
-        "username": credentials.email,
+        "username": credentials.username,
         'attributes': {'token_unico': [token_unico]},
         "enabled": True,
         "credentials": [{"value": credentials.password, "type": "password"}]

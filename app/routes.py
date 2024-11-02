@@ -1,32 +1,36 @@
-from flask import request
+from flask import Flask, request, jsonify
 from .auth import login, logout, register, update_password, AuthCredentials
 
+
 def init_routes(app):
-    @app.route('/get_login', methods=['GET'])
+    @app.route('/login', methods=['POST'])  # Mudamos para POST
     def login_rqst():
-        if request.method == 'GET':
-            try:
-                credentials = AuthCredentials(
-                    email=request.args.get("email"),
-                    password=request.args.get("password")
-                )
-                return login(credentials)
-            except Exception as e:
-                return f"Error: {e}"
+        try:
+            data = request.json  # Espera receber dados em formato JSON
+            credentials = AuthCredentials(
+                email=data.get("email"),
+                password=data.get("password")
+            )
+            result = login(credentials)
+            return result, 200
+        except Exception as e:
+            return jsonify({"error": str(e)}), 401  # Retorna 401 em caso de erro de autenticação
 
-    @app.route('/get_reg', methods=['GET'])
+    @app.route('/register', methods=['POST'])
     def register_rqst():
-        if request.method == 'GET':
-            try:
-                credentials = AuthCredentials(
-                    email=request.args.get("email"),
-                    password=request.args.get("password")
-                )
-                return register(credentials)
-            except Exception as e:
-                return f"Error: {e}"
+        try:
+            data = request.json  # Espera receber dados em formato JSON
+            credentials = AuthCredentials(
+                username=data.get("username"),
+                email=data.get("email"),
+                password=data.get("password")
+            )
+            result = register(credentials)
+            return jsonify({"message": result}), 200
+        except Exception as e:
+            return jsonify({"error": str(e)}), 400
 
-    @app.route('/get_unl', methods=['GET'])
+    @app.route('/logout', methods=['GET'])
     def logout_rqst():
         if request.method == 'GET':
             try:
