@@ -13,7 +13,7 @@ class Config:
     KEYCLOAK_SERVER_URL = os.getenv('KEYCLOAK_SERVER_URL', 'http://localhost:8080/auth/')
     KEYCLOAK_REALM = os.getenv('KEYCLOAK_REALM', 'master')
     KEYCLOAK_CLIENT_ID = os.getenv('KEYCLOAK_CLIENT_ID', 'PythonClient')
-    KEYCLOAK_SECRET = os.getenv('KEYCLOAK_SECRET', '214e6a96-3149-4df2-8846-2db1c1a9e4d3')
+    KEYCLOAK_SECRET = os.getenv('KEYCLOAK_SECRET', 'rANZC0p_W2XP9Pn2zlj3UOtp54JdVHZJoS82hLPVmPI')
 
     # admin Keycloak
     KEYCLOAK_ADMIN_USERNAME = os.getenv('KEYCLOAK_ADMIN_USERNAME', 'admin')
