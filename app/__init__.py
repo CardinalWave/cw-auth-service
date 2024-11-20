@@ -1,4 +1,5 @@
 from flask import Flask
+from flask_cors import CORS
 from keycloak import KeycloakAdmin, KeycloakOpenID
 from .config import Config
 
@@ -12,14 +13,17 @@ keycloak_openid = KeycloakOpenID(
 
 keycloak_admin = KeycloakAdmin(
     server_url=Config.KEYCLOAK_SERVER_URL,
-    username=Config.KEYCLOAK_ADMIN_USERNAME,
-    password=Config.KEYCLOAK_ADMIN_PASSWORD,
-    realm_name=Config.KEYCLOAK_REALM
+    client_id=Config.KEYCLOAK_CLIENT_ID,
+    username='admin',
+    password='admin',
+    realm_name="master-custom",
+    verify=True,
+    client_secret_key=Config.KEYCLOAK_SECRET
 )
-
 
 def create_app():
     app = Flask(__name__)
+    CORS(app)
     app.config.from_object(Config)
 
     from .routes import init_routes

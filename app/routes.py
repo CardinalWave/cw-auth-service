@@ -1,33 +1,46 @@
 from flask import Flask, request, jsonify
 from .auth import login, logout, register, update_password, AuthCredentials
-
+import json
 
 def init_routes(app):
     @app.route('/login', methods=['POST'])  # Mudamos para POST
     def login_rqst():
         try:
-            data = request.json  # Espera receber dados em formato JSON
+            if not request.is_json:
+                return jsonify({"error": "Request must be JSON"}), 400
+
+            data_str = request.json
+            data = json.loads(data_str)
             credentials = AuthCredentials(
                 email=data.get("email"),
-                password=data.get("password")
+                password=data.get("password"),
+                username=data.get("username")
             )
             result = login(credentials)
             return result, 200
         except Exception as e:
-            return jsonify({"error": str(e)}), 401  # Retorna 401 em caso de erro de autenticação
+            print(e)
+            return jsonify({"error": str(e)}), 401
 
     @app.route('/register', methods=['POST'])
     def register_rqst():
         try:
-            data = request.json  # Espera receber dados em formato JSON
+            if not request.is_json:
+                return jsonify({"error": "Request must be JSON"}), 400
+
+            data_str = request.json
+            data = json.loads(data_str)
+            print(data)
             credentials = AuthCredentials(
                 username=data.get("username"),
                 email=data.get("email"),
                 password=data.get("password")
             )
             result = register(credentials)
-            return jsonify({"message": result}), 200
+            print(result)
+            return result, 200
         except Exception as e:
+            print(e)
             return jsonify({"error": str(e)}), 400
 
     @app.route('/logout', methods=['GET'])
