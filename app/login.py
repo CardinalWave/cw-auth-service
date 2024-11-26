@@ -2,7 +2,7 @@
 import json
 
 class Login:
-    def __init__(self, token: str, email: str, username: str) -> None:
+    def __init__(self, token: any, email: any, username: any) -> None:
         self.token = token
         self.email = email
         self.username = username
