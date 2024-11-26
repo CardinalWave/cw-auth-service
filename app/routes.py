@@ -1,16 +1,21 @@
-from flask import Flask, request, jsonify
+from flask import Flask, jsonify, request
+from flask import request as FlaskRequest
+
 from .auth import login, logout, register, update_password, AuthCredentials
 import json
+
+from .http_types.http_request import HttpRequest
+
 
 def init_routes(app):
     @app.route('/login', methods=['POST'])  # Mudamos para POST
     def login_rqst():
         try:
-            if not request.is_json:
+            http_request = get_request(request)
+            if not http_request:
                 return jsonify({"error": "Request must be JSON"}), 400
 
-            data_str = request.json
-            data = json.loads(data_str)
+            data = http_request.body
             credentials = AuthCredentials(
                 email=data.get("email"),
                 password=data.get("password"),
@@ -25,11 +30,11 @@ def init_routes(app):
     @app.route('/register', methods=['POST'])
     def register_rqst():
         try:
-            if not request.is_json:
+            http_request = get_request(request)
+            if not http_request:
                 return jsonify({"error": "Request must be JSON"}), 400
 
-            data_str = request.json
-            data = json.loads(data_str)
+            data = http_request.body
             print(data)
             credentials = AuthCredentials(
                 username=data.get("username"),
@@ -63,3 +68,18 @@ def init_routes(app):
                 return update_password(credentials, token_recovery)
             except Exception as e:
                 return f"Error: {e}"
+
+
+def get_request(request_: FlaskRequest):
+    body = None
+    if request_.data: body = request_.json
+    http_request = HttpRequest(
+        body=body,
+        headers=request_.headers,
+        query_params=request_.args,
+        path_params=request_.view_args,
+        url=request_.full_path
+    )
+
+    return http_request
+
