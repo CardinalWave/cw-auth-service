@@ -3,4 +3,8 @@ from app import create_app
 app = create_app()
 
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=5055)
+    try:
+        # capture_client_secret()
+        app.run(host="0.0.0.0", port=5055)
+    except:
+        print("Falha ao iniciar")

@@ -4,10 +4,11 @@ from keycloak import KeycloakAdmin, KeycloakOpenID
 from .config import Config
 
 
-class ConnKeycloack():
+class ConnKeycloak:
     def __init__(self) -> None:
         self.__keycloak_openid = None
         self.__keycloak_admin = None
+        self.config_keycloak()
 
     def config_keycloak(self):
         # Configuração do Keycloak
@@ -23,15 +24,18 @@ class ConnKeycloack():
             client_id=Config.KEYCLOAK_CLIENT_ID,
             username='admin',
             password='admin',
-            realm_name="master-custom",
-            verify=True,
+            realm_name=Config.KEYCLOAK_REALM,
+            verify=False,
             client_secret_key=Config.KEYCLOAK_SECRET
         )
-    def get_keycloak_openid(self):
+    def get_keycloak_openid(self) -> KeycloakOpenID:
         return self.__keycloak_openid
 
-    def get_keycloak_admin(self):
+    def get_keycloak_admin(self) -> KeycloakAdmin:
         return self.__keycloak_admin
+
+    def get_secret_keycloak(self):
+        return Config.KEYCLOAK_SECRET
 
 def create_app():
     app = Flask(__name__)

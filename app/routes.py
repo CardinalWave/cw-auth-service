@@ -1,8 +1,8 @@
+
 from flask import Flask, jsonify, request
 from flask import request as FlaskRequest
 
-from .auth import login, logout, register, update_password, AuthCredentials
-import json
+from .auth import AuthCredentials, AuthRequest
 
 from .http_types.http_request import HttpRequest
 
@@ -18,10 +18,8 @@ def init_routes(app):
             data = http_request.body
             credentials = AuthCredentials(
                 email=data.get("email"),
-                password=data.get("password"),
-                username=data.get("username")
-            )
-            result = login(credentials)
+                password=data.get("password"))
+            result = AuthRequest().login(credentials)
             return result, 200
         except Exception as e:
             print(e)
@@ -35,40 +33,28 @@ def init_routes(app):
                 return jsonify({"error": "Request must be JSON"}), 400
 
             data = http_request.body
-            print(data)
             credentials = AuthCredentials(
                 username=data.get("username"),
                 email=data.get("email"),
                 password=data.get("password")
             )
-            result = register(credentials)
-            print(result)
+            result = AuthRequest().register(credentials)
             return result, 200
         except Exception as e:
             print(e)
             return jsonify({"error": str(e)}), 400
 
-    @app.route('/logout', methods=['GET'])
+    @app.route('/logout', methods=['POST'])
     def logout_rqst():
-        if request.method == 'GET':
-            try:
-                return logout()
-            except Exception as e:
-                return f"Error: {e}"
+        try:
+            http_request = get_request(request)
+            if not http_request:
+                return jsonify({"error": "Request must be JSON"}), 400
 
-    @app.route('/get_upd', methods=['GET'])
-    def update_rqst():
-        if request.method == 'GET':
-            try:
-                credentials = AuthCredentials(
-                    email=request.args.get("email"),
-                    password=request.args.get("password")
-                )
-                token_recovery = request.args.get("token")
-                return update_password(credentials, token_recovery)
-            except Exception as e:
-                return f"Error: {e}"
-
+            data = http_request.body
+            return AuthRequest().logout(AuthCredentials(user_token=data.get("token")))
+        except Exception as e:
+            return f"Error: {e}"
 
 def get_request(request_: FlaskRequest):
     body = None
